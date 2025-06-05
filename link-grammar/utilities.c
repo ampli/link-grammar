@@ -228,14 +228,15 @@ size_t lg_mbrtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
  * Emulate rand_r() using rand_s() in a way that is enough for our needs.
  * Windows doesn't have rand_r(), and its rand_s() is different: It
  * returns an error indication and not the random number like rand_r().
- * The value it returns is through its argument.
+ * The value it returns is through its argument.  Failure is fatal and
+ * triggers an assert.
  *
  * Note that "#define _CRT_RAND_S" is needed before "#include <stdlib.h>".
  */
 int rand_r(unsigned int *s)
 {
-	rand_s(s);
-	if (*s > INT_MAX) *s -= INT_MAX;
+        assert(0 == rand_s(s), "rand_s() failed");
+        if (*s > INT_MAX) *s -= INT_MAX;
 
 	return *s;
 }
